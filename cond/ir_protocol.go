@@ -1,5 +1,7 @@
 package cond
 
+import "C"
+
 const (
 	COLD int64 = 2
 	WAVE int64 = 3
@@ -9,11 +11,11 @@ const (
 	ON  int64 = 1
 	OFF int64 = 0
 
-	ONE     string = "1400 "
-	ZERO    string = "3350 "
-	SPACE   string = "640 "
-	HEADER  string = "6125 "
-	HEADER2 string = "7400 "
+	ONE     C.double = 1400
+	ZERO    C.double = 3350
+	SPACE   C.double = 640
+	HEADER  C.double = 6125
+	HEADER2 C.double = 7400
 )
 
 func Encode(enabled, mode, temp int64) int64 {
@@ -46,23 +48,24 @@ func Encode(enabled, mode, temp int64) int64 {
 	return msg
 }
 
-func Serialize(msg int64) string {
-	var str string
-	str += HEADER
-	str += HEADER2
-	str += SPACE
+func Serialize(msg int64) []C.double {
+	var str []C.double
+	str = append(str, HEADER)
+	str = append(str, HEADER2)
+	str = append(str, SPACE)
 	var p int64 = 1 << 47
 	for n := 0; n < 48; n++ {
 		if msg&p != 0 {
-			str += ONE
+			str = append(str, ONE)
 		} else {
-			str += ZERO
+			str = append(str, ZERO)
 		}
-		str += SPACE
+		str = append(str, SPACE)
 		p = p >> 1
 	}
-	str += HEADER2
-	str += SPACE
+	str = append(str, HEADER2)
+	str = append(str, SPACE)
+
 	return str
 
 }

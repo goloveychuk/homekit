@@ -50,6 +50,7 @@ func sendState(therm *accessory.Thermostat) {
 	fmt.Println(enabled, mode)
 	msg := cond.Encode(enabled, mode, int64(temp))
 	resp := cond.Serialize(msg)
+	cond.Send(resp)
 	therm.Thermostat.CurrentTemperature.SetValue(temp)
 	therm.Thermostat.CurrentHeatingCoolingState.SetValue(coolingState)
 	fmt.Println(resp)

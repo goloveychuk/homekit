@@ -23,13 +23,14 @@ static inline void addPulse(uint32_t onPins, uint32_t offPins, uint32_t duration
 // on GPIO pin outPin. dutyCycle is a floating value between 0 and 1.
 static inline void carrierFrequency(uint32_t outPin, double frequency, double dutyCycle, double duration, gpioPulse_t *irSignal, int *pulseCount)
 {
+    printf("pulse %f\n", duration);
 	double oneCycleTime = 1000000.0 / frequency; // 1000000 microseconds in a second
 	int onDuration = (int)round(oneCycleTime * dutyCycle);
 	int offDuration = (int)round(oneCycleTime * (1.0 - dutyCycle));
 
 	int totalCycles = (int)round(duration / oneCycleTime);
 	int totalPulses = totalCycles * 2;
-
+    
 	int i;
 	for (i = 0; i < totalPulses; i++)
 	{
@@ -49,68 +50,49 @@ static inline void carrierFrequency(uint32_t outPin, double frequency, double du
 // Generates a low signal gap for duration, in microseconds, on GPIO pin outPin
 static inline void gap(uint32_t outPin, double duration, gpioPulse_t *irSignal, int *pulseCount)
 {
+    printf("space %f\n", duration);    
 	addPulse(0, 0, duration, irSignal, pulseCount);
 }
 
 static inline int irSling(uint32_t outPin,
 	int frequency,
 	double dutyCycle,
-	int leadingPulseDuration,
-	int leadingGapDuration,
-	int onePulse,
-	int zeroPulse,
-	int oneGap,
-	int zeroGap,
-	int sendTrailingPulse,
-	const char *code)
-{
+	double *codes, int len){
 	if (outPin > 31)
 	{
 		// Invalid pin number
 		return 1;
 	}
+    
 
-	size_t codeLen = strlen(code);
+	// // printf("code size is %zu\n", codeLen);
 
-	printf("code size is %zu\n", codeLen);
-
-	if (codeLen > MAX_COMMAND_SIZE)
-	{
-		// Command is too big
-		return 1;
-	}
+	// if (codeLen > MAX_COMMAND_SIZE)
+	// {
+	// 	// Command is too big
+	// 	return 1;
+	// }
 
 	gpioPulse_t irSignal[MAX_PULSES];
 	int pulseCount = 0;
 
 	// Generate Code
-	carrierFrequency(outPin, frequency, dutyCycle, leadingPulseDuration, irSignal, &pulseCount);
-	gap(outPin, leadingGapDuration, irSignal, &pulseCount);
-
-	int i;
-	for (i = 0; i < codeLen; i++)
-	{
-		if (code[i] == '0')
-		{
-			carrierFrequency(outPin, frequency, dutyCycle, zeroPulse, irSignal, &pulseCount);
-			gap(outPin, zeroGap, irSignal, &pulseCount);
-		}
-		else if (code[i] == '1')
-		{
-			carrierFrequency(outPin, frequency, dutyCycle, onePulse, irSignal, &pulseCount);
-			gap(outPin, oneGap, irSignal, &pulseCount);
-		}
-		else
-		{
-			printf("Warning: Non-binary digit in command\n");
-		}
-	}
-
 	
-    carrierFrequency(outPin, frequency, dutyCycle, leadingGapDuration, irSignal, &pulseCount);
-    gap(outPin, frequency, dutyCycle, oneGap, irSignal, &pulseCount);
 
-
+	int flag = 1;
+    int i;
+    for (i = 0; i<len; i++) {
+        int dur = codes[i]; 
+        if (flag) {
+        	carrierFrequency(outPin, frequency, dutyCycle, dur, irSignal, &pulseCount);
+            flag = 0;    
+        } else {
+        	gap(outPin, dur, irSignal, &pulseCount);
+            flag = 1;
+        }
+    }
+	
+    
 	printf("pulse count is %i\n", pulseCount);
 	// End Generate Code
 
