@@ -1,4 +1,4 @@
-package main
+package cond
 
 const (
 	COLD int64 = 2
@@ -16,7 +16,7 @@ const (
 	HEADER2 string = "7400 "
 )
 
-func encode(enabled, mode, temp int64) int64 {
+func Encode(enabled, mode, temp int64) int64 {
 	temp = temp - 17
 
 	var msg int64
@@ -46,7 +46,7 @@ func encode(enabled, mode, temp int64) int64 {
 	return msg
 }
 
-func serialize(msg int64) string {
+func Serialize(msg int64) string {
 	var str string
 	str += HEADER
 	str += HEADER2

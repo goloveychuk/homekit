@@ -1,9 +1,21 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/log"
+	"github.com/goloveychuk/homekit/cond"
+)
+
+const (
+	MIN  = 18.0
+	MAX  = 30.0
+	OFF  = 0
+	HEAT = 1
+	COOL = 2
+	AUTO = 3
 )
 
 func turnLightOn() {
@@ -14,13 +26,32 @@ func turnLightOff() {
 	log.Println("Turn Light Off")
 }
 
-func getState(therm *accessory.Thermostat) int64 {
-	val := therm.Thermostat.CurrentHeatingCoolingState.GetValue()
-	switch val {
-	case 1:
-		return COLD
+func sendState(therm *accessory.Thermostat) {
+	temp := therm.Thermostat.TargetTemperature.GetValue()
+	if temp > MAX {
+		temp = MAX
 	}
-	return -1
+	if temp < MIN {
+		temp = MIN
+	}
+	coolingState := therm.Thermostat.TargetHeatingCoolingState.GetValue()
+	mode := cond.COLD
+	enabled := cond.ON
+	switch coolingState {
+	case OFF:
+		enabled = cond.OFF
+	case COOL:
+		mode = cond.COLD
+	case HEAT:
+		mode = cond.HEAT
+	case AUTO:
+		mode = cond.WAVE
+	}
+	fmt.Println(enabled, mode)
+	msg := cond.Encode(enabled, mode, int64(temp))
+	resp := cond.Serialize(msg)
+	fmt.Println(resp)
+
 }
 func main() {
 	log.Verbose = true
@@ -29,24 +60,15 @@ func main() {
 		Name:         "Air conditioner2",
 		Manufacturer: "Matthias",
 	}
-	min := 18.0
-	max := 30.0
-	acc := accessory.NewThermostat(info, 23, min, max, 1)
+
+	acc := accessory.NewThermostat(info, 23, MIN, MAX, 1)
 
 	acc.Thermostat.TargetTemperature.OnValueRemoteUpdate(func(temp float64) {
-		if temp > max {
-			temp = max
-		}
-		if temp < min {
-			temp = min
-		}
-		state := getState(acc)
-		msg := encode(ON, state, int64(temp))
-		resp := serialize(msg)
-		log.Println("updating target temp", resp)
+		sendState(acc)
 		log.Println("updating target temp", temp)
 	})
 	acc.Thermostat.TargetHeatingCoolingState.OnValueRemoteUpdate(func(state int) {
+		sendState(acc)
 		log.Println("new cooling state", state)
 	})
 
