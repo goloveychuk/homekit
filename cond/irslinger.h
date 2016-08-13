@@ -5,8 +5,8 @@
 #include <math.h>
 #include <pigpio.h>
 
-#define MAX_COMMAND_SIZE 512
-#define MAX_PULSES 12000
+#define MAX_COMMAND_SIZE 5120
+#define MAX_PULSES 120000
 
 static inline void addPulse(uint32_t onPins, uint32_t offPins, uint32_t duration, gpioPulse_t *irSignal, int *pulseCount)
 {
