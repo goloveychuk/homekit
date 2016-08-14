@@ -24,7 +24,7 @@ static inline void addPulse(uint32_t onPins, uint32_t offPins, uint32_t duration
 // on GPIO pin outPin. dutyCycle is a floating value between 0 and 1.
 static inline void carrierFrequency(uint32_t outPin, double frequency, double dutyCycle, double duration, gpioPulse_t *irSignal, int *pulseCount)
 {
-    printf("pulse %f\n", duration);
+    // printf("pulse %f\n", duration);
 	double oneCycleTime = 1000000.0 / frequency; // 1000000 microseconds in a second
 	int onDuration = (int)round(oneCycleTime * dutyCycle);
 	int offDuration = (int)round(oneCycleTime * (1.0 - dutyCycle));
@@ -51,7 +51,7 @@ static inline void carrierFrequency(uint32_t outPin, double frequency, double du
 // Generates a low signal gap for duration, in microseconds, on GPIO pin outPin
 static inline void gap(uint32_t outPin, double duration, gpioPulse_t *irSignal, int *pulseCount)
 {
-    printf("space %f\n", duration);    
+    // printf("space %f\n", duration);    
 	addPulse(0, 0, duration, irSignal, pulseCount);
 }
 

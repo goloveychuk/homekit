@@ -18,14 +18,6 @@ const (
 	AUTO = 3
 )
 
-func turnLightOn() {
-	log.Println("Turn Light On")
-}
-
-func turnLightOff() {
-	log.Println("Turn Light Off")
-}
-
 func sendState(therm *accessory.Thermostat) {
 	temp := therm.Thermostat.TargetTemperature.GetValue()
 	if temp > MAX {
@@ -62,7 +54,7 @@ func main() {
 		Manufacturer: "Matthias",
 	}
 
-	acc := accessory.NewThermostat(info, 23, MIN, MAX, 1)
+	acc := accessory.NewThermostat(info, 24, MIN, MAX, 1)
 
 	acc.Thermostat.TargetTemperature.OnValueRemoteUpdate(func(temp float64) {
 		sendState(acc)
