@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include <pigpio.h>
+#include <stdio.h>
 
 #define MAX_COMMAND_SIZE 5120
 #define MAX_PULSES 120000

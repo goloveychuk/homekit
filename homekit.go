@@ -45,7 +45,7 @@ func sendState(therm *accessory.Thermostat) {
 	case HEAT:
 		mode = cond.HEAT
 	case AUTO:
-		mode = cond.WAVE
+		mode = cond.AUTO
 	}
 	fmt.Println(enabled, mode)
 	msg := cond.Encode(enabled, mode, int64(temp))
@@ -53,8 +53,6 @@ func sendState(therm *accessory.Thermostat) {
 	cond.Send(resp)
 	therm.Thermostat.CurrentTemperature.SetValue(temp)
 	therm.Thermostat.CurrentHeatingCoolingState.SetValue(coolingState)
-	fmt.Println(resp)
-
 }
 func main() {
 	log.Verbose = true

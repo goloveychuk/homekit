@@ -4,9 +4,9 @@ import "C"
 
 const (
 	COLD int64 = 2
-	WAVE int64 = 3
-	HEAT int64 = 1
-	CIRC int64 = 0
+	HEAT int64 = 3
+	DRY  int64 = 1
+	AUTO int64 = 0
 
 	ON  int64 = 1
 	OFF int64 = 0
